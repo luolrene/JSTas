@@ -1,0 +1,181 @@
+.operate-container{
+  width: calc(100% - 40px);
+  padding: 15px 20px;
+}
+.pc-container{
+  padding-top: 15px;
+  padding-right: 15px;
+  padding-left: 15px;
+  padding-bottom: 12px;
+}
+
+/* 列表按钮组样式 */
+.list-Button{
+  display: flex;
+}
+.list-form{
+  display: flex;
+  justify-content: flex-start;
+  flex-wrap:wrap
+}
+.operate-button{
+  display: flex;
+  justify-content: center;
+}
+
+
+/* 公共按钮样式 */
+.el-button--primary{
+  background-color: #0195DB;
+  height: 40px;
+  border-radius: 5px;
+}
+
+.el-button--primary.is-plain{
+  height: 26px !important;
+  line-height: 12px;
+  border-radius: 5px;
+  color: #0195DB;
+  border: 1px solid #0195DB;
+  background-color: #FFFFFF;
+}
+.el-button--primary.is-plain:focus, .el-button--primary.is-plain:hover{
+  color: #ffffff;
+  border: 1px solid #0195DB;
+  background-color: #0195DB;
+}
+.el-button--danger.is-plain{
+  height: 26px;
+  line-height: 12px;
+  border-radius: 5px;
+  color: #FF798D;
+  border: 1px solid #FF798D;
+  background-color: #FFFFFF;
+}
+.el-button--danger.is-plain:focus, .el-button--danger.is-plain:hover{
+  color: #FFFFFF;
+  border: 1px solid #FF798D;
+  background-color: #FF798D;
+}
+.el-button--mini, .el-button--mini.is-round{
+  padding: 7px 12px;
+}
+
+/* 滚动条样式 */
+* {
+  scrollbar-color: #e5e5e5 #f7f7f9; /* 滑块颜色  滚动条背景颜色 */
+  scrollbar-width: thin; /* 滚动条宽度有三种：thin、auto、none */
+}
+.el-scrollbar__wrap {
+  overflow-x: auto;
+}
+.el-select-dropdown .el-scrollbar {
+  padding-bottom: 17px;
+}
+.el-cascader-menu {
+  padding-bottom: 15px;
+}
+.page-component__scroll{
+  height: 100%;
+}
+
+body::-webkit-scrollbar{
+  width:6px;
+  height:10px;
+}
+body::-webkit-scrollbar-track{
+  background: rgb(239, 239, 239);
+  border-radius:2px;
+}
+body::-webkit-scrollbar-thumb{
+  background: #bfbfbf;
+  border-radius:10px;
+}
+body::-webkit-scrollbar-thumb:hover{
+  background: #666666;
+}
+
+div::-webkit-scrollbar{
+  width:10px;
+  height:10px;
+}
+div::-webkit-scrollbar-track{
+  background: rgb(239, 239, 239);
+  border-radius:2px;
+}
+div::-webkit-scrollbar-thumb{
+  background: #bfbfbf;
+  border-radius:10px;
+}
+div::-webkit-scrollbar-thumb:hover{
+  background: #666666;
+}
+div::-webkit-scrollbar-corner{
+  background: #0195DB;
+}
+
+/* 文本框样式 */
+.el-input.is-disabled .el-input__inner{
+  color: #666666;
+}
+/* 输入框的高度 */
+.el-button--primary,
+.el-button--danger{
+  height: 34px;
+}
+
+/* layer样式层 */
+.vl-notify.vl-notify-main{
+  border-radius: 15px;
+}
+
+.el-message.is-closable .el-message__content{
+  width: 1000px;
+  word-wrap:break-word;
+  text-align: center;
+  /* height: 60px; */
+}
+
+/* 多选款高度问题 */
+.el-select__tags{
+  max-width: auto;
+}
+/* input框旁边小图标样式 */
+.inputIconClass{
+  margin-left: 4px;
+}
+.inputIconClass:hover{
+  color: #018CCE;
+  cursor: pointer;
+}
+/* ---------------------------------- 原始记录 ---------------------------------------- */
+.record-container{
+  height: 98%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.record-container .title {
+  height: 40px;
+}
+.record-container .title .buttonGroup{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 3px 0;
+  position: absolute;
+  right: 0;
+  top: 0;
+  background-color: #DDF4ED;
+  width: 360px;
+  border-bottom-left-radius: 55px;
+}
+.record-container .el-button--primary, .el-button--danger{
+  height: 30px;
+}
+
+/* 输出框高度 */
+.el-input__inner{
+    height: 34px;
+}

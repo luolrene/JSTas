@@ -1,0 +1,279 @@
+<!-- 原始记录校对 -->
+<template>
+  <div class="pc-container">
+    <fromSearch ref="fromSearch" :obj="this" :fromValiData="fromValiData" :fromData="fromData">
+      <el-button type="primary" :size="$layer_Size.buttonSize" class="default-btn" icon="el-icon-search" @click="doSearch()">查询</el-button>
+      <el-button type="primary" :size="$layer_Size.buttonSize" class="default-btn" icon="el-icon-refresh" @click="doReset('fromValiData')">重置</el-button>
+    </fromSearch>
+    <tableItem
+    :obj="this"
+    :tableData="tableData"
+    :tableHeader="tableHeader"
+    :button="button"
+    :dataSum='fromValiData.dataSum'
+    :loading="loading"
+    :isSelection="false"
+    @handleSizeChange="handleSizeChange"></tableItem>
+  </div>
+</template>
+
+<script>
+import details from '../../contract/msg/details.vue'
+import recordHandle from './record_handle.vue'
+import {getContractQueryContractById} from '../../../api/contract/msg.js'
+import {getOriginalCyQueryPageList, getOriginalCyModifyData} from '../../../api/sampling/original.js'
+export default {
+  components: {
+
+  },
+  data () {
+    return {
+      loading: false,
+
+      fromValiData: {
+        pageSize: 10,
+        pageNow: 1,
+        status: '1_1',
+        step: '2'
+      },
+      fromData: [
+        {type: 'input', prop: 'proName', label: '项目名称'},
+        {type: 'input', prop: 'custName', label: '客户名称'},
+        {type: 'input', prop: 'reportNo', label: '报告编号'},
+        {type: 'input', prop: 'jdOperName', label: '校对人'},
+        {type: 'input', prop: 'subManName', label: '提交人'}
+      ],
+      tableData: [
+
+      ],
+      tableHeader: [{
+        prop: 'project',
+        label: '项目名称',
+        type: 'view',
+        width: 180,
+        condition: function (params) {
+          if (params.taskLev === '2') {
+            return '#E6A23C'
+          } else if (params.taskLev === '3') {
+            return 'red'
+          }
+        }
+      }, {
+        prop: 'custName',
+        label: '客户',
+        width: 90
+      }, {
+        prop: 'reportNo',
+        label: '报告编号',
+        width: 90
+      }, {
+        prop: 'sampTaskName',
+        label: '采样任务名称',
+        width: 120
+      }, {
+        prop: 'statusName',
+        label: '原始记录状态',
+        width: 120
+      }, {
+        prop: 'contStatusName',
+        label: '合同状态',
+        width: 90
+      }, {
+        prop: 'jdOperName',
+        label: '校对人',
+        width: 70
+      }, {
+        prop: 'subManName',
+        label: '提交人',
+        width: 70
+      }, {
+        prop: 'subJdTime',
+        label: '提交时间',
+        width: 90
+      }],
+      button: {
+        width: 240,
+        buttonList: [
+          {name: '提交审核',
+            type: 'primary',
+            click: 'handleReview',
+            condition: (params) => {
+              if (params.contStatus !== '07' && params.jdSignNum === 0) {
+                return true
+              }
+            }
+          },
+          {name: '退回',
+            type: 'primary',
+            click: 'handleReturn',
+            condition: (params) => {
+              if (params.contStatus !== '07') {
+                return true
+              }
+            }
+          },
+          {name: '原始记录',
+            type: 'primary',
+            click: 'handleRecord',
+            condition: (params) => {
+              if (params.contStatus !== '07') {
+                return true
+              }
+            }
+          }
+        ]
+      }
+    }
+  },
+  methods: {
+    getListData () {
+      this.loading = true
+      getOriginalCyQueryPageList(this.fromValiData).then(res => {
+        res.result.pageList.forEach(xdd => {
+          switch (xdd.status) {
+            case '0':
+              xdd.statusName = '初始'
+              break
+            case '1':
+              xdd.statusName = '审核中'
+              break
+            case '1_1':
+              xdd.statusName = '校对中'
+              break
+            case '2':
+              xdd.statusName = '审核通过'
+              break
+            case '3':
+              xdd.statusName = '退回'
+              break
+            case '4':
+              xdd.statusName = '报告退回'
+              break
+            case '4_1':
+              xdd.statusName = '退回采样'
+              break
+          }
+          switch (xdd.contStatus) {
+            case '00':
+              xdd.contStatusName = '草稿'
+              break
+            case '01':
+              xdd.contStatusName = '审核中'
+              break
+            case '02':
+              xdd.contStatusName = '审核通过'
+              break
+            case '03':
+              xdd.contStatusName = '审核退回'
+              break
+            case '04':
+              xdd.contStatusName = '放弃'
+              break
+            case '05':
+              xdd.contStatusName = '已完成'
+              break
+            case '06':
+              xdd.contStatusName = '进行中'
+              break
+            case '07':
+              xdd.contStatusName = '变更审核'
+              break
+          }
+        })
+        this.tableData = res.result.pageList
+        this.fromValiData.dataSum = res.result.dataSum
+        this.loading = false
+      }).catch(err => {
+        this.$message.error(err.message)
+        this.loading = false
+      })
+    },
+    handleReview(params) {
+      this.$share.confirm({
+        message: '此操作将提交数据进行审核，是否继续?',
+        confirm: () => {
+          let ids = {...params}
+          ids.status = '1'
+          getOriginalCyModifyData(ids).then(res => {
+            this.$share.message('提交成功')
+            this.getListData()
+          })
+        }
+      })
+    },
+    handleReturn(params) {
+      this.$prompt('此操作将退回原始记录, 是否继续?', '退回', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        inputType: 'textarea'
+      }).then(({ value }) => {
+        params.status = '3'
+        params.returnReason = value
+        getOriginalCyModifyData(params).then(res => {
+          this.getListData()
+          this.$share.message('退回成功')
+        })
+      })
+    },
+    handleRecord(params) {
+      this.$layer.iframe({
+        content: {
+          content: recordHandle, // 传递的组件对象
+          parent: this, // 当前的vue对象
+          data: {
+            params: params,
+            fileSign: '1' // 1是校对标记   2是审核标记
+          }// props
+        },
+        area: this.$layer_Size.Self_Max,
+        title: '原始记录',
+        maxmin: true,
+        shadeClose: false
+      })
+    },
+    handleDetails (params) {
+      getContractQueryContractById({contId: params.contId}).then(res => {
+        this.$layer.iframe({
+          content: {
+            content: details, // 传递的组件对象
+            parent: this, // 当前的vue对象
+            data: {
+              params: res.result
+            }// props
+          },
+          area: this.$layer_Size.Self_Max,
+          title: '查看详情',
+          maxmin: true,
+          shadeClose: false
+        })
+      })
+    },
+    doSearch () {
+      this.fromValiData.pageNow = 1
+      this.getListData()
+    },
+    doReset (formName) {
+      this.fromValiData.pageNow = 1
+      this.$refs.fromSearch.$refs.fromValiData.resetFields()
+      this.getListData()
+    },
+    handleSizeChange (val, pageSize) {
+      this.fromValiData.pageNow = val
+      if (pageSize) {
+        this.fromValiData.pageSize = pageSize
+      }
+      this.getListData()
+    }
+  },
+  mounted () {
+    this.getListData()
+  },
+  created () {
+
+  }
+}
+</script>
+
+<style scoped lang="scss">
+
+</style>

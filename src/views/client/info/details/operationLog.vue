@@ -1,0 +1,101 @@
+<!--操作日志 -->
+<template>
+  <div class="pc-container">
+    <fromSearch ref="fromSearch" :obj="this" :fromValiData="fromValiData" :fromData="fromData">
+      <el-button type="primary" :size="$layer_Size.buttonSize" class="default-btn" icon="el-icon-search" @click="doSearch()">查询</el-button>
+      <el-button type="primary" :size="$layer_Size.buttonSize" class="default-btn" icon="el-icon-refresh" @click="doReset('fromValiData')">重置</el-button>
+    </fromSearch>
+    <tableItem
+    :obj="this"
+    :tableData="tableData"
+    :tableHeader="tableHeader"
+    :dataSum='fromValiData.dataSum'
+    :loading="loading"
+    customHeight="450"
+    :isSelection="false"
+    @handleSizeChange="handleSizeChange"></tableItem>
+  </div>
+</template>
+
+<script>
+import {getMyLogQueryPageData} from '@/api/common.js'
+export default {
+  props: {
+    params: Object
+  },
+  components: {
+
+  },
+  data () {
+    return {
+      loading: false,
+      fromValiData: {
+        pageSize: 10,
+        pageNow: 1
+      },
+      fromData: [
+        {type: 'input', prop: 'userMobile', label: '操作人电话'}
+      ],
+      tableData: [
+      ],
+      tableHeader: [{
+        prop: 'userName',
+        label: '操作人',
+        width: 90
+      }, {
+        prop: 'userMobile',
+        label: '操作人号码',
+        width: 90
+      }, {
+        prop: 'remarks',
+        label: '操作内容',
+        width: 90
+      }, {
+        prop: 'createTime',
+        label: '操作时间',
+        width: 90
+      }]
+    }
+  },
+  methods: {
+    getListData () {
+      this.loading = true
+      this.fromValiData.contractId = this.params.id
+      getMyLogQueryPageData(this.fromValiData).then(res => {
+        this.tableData = res.result.pageList
+        this.fromValiData.dataSum = res.result.dataSum
+        this.loading = false
+      }).catch(err => {
+        this.$message.error(err.message)
+        this.loading = false
+      })
+    },
+    handleSizeChange (val, pageSize) {
+      this.fromValiData.pageNow = val
+      if (pageSize) {
+        this.fromValiData.pageSize = pageSize
+      }
+      this.getListData()
+    },
+    doSearch () {
+      this.fromValiData.pageNow = 1
+      this.getListData()
+    },
+    doReset () {
+      this.fromValiData.pageNow = 1
+      this.$refs.fromSearch.$refs.fromValiData.resetFields()
+      this.getListData()
+    }
+  },
+  mounted () {
+    this.getListData()
+  },
+  created () {
+
+  }
+}
+</script>
+
+<style scoped lang="scss">
+
+</style>
